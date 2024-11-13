@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" rel="stylesheet">
+    <title>Sierpinski Triangle</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext("2d");
+        
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill()
+            }
+        }
+
+        const sideLength = canvas.height / 3;
+        const height = Math.sqrt(3) / 2 * sideLength;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const triangleTop = new Point(centerX, centerY - height + 10);
+        triangleTop.draw();
+        const triangleLeft = new Point(centerX - sideLength , centerY + height + 10);
+        triangleLeft.draw();
+        const triangleRight = new Point(centerX + sideLength , centerY + height + 10);
+        triangleRight.draw();
+
+        const trianglePoints = [triangleLeft, triangleTop, triangleRight]
+        console.dir(trianglePoints);
+
+        const yMin = triangleTop.y;
+        const yMax = triangleLeft.y;
+
+        var randomY = Math.random() * (yMax - yMin) + yMin;
+        const xMin = triangleLeft.x + (randomY - triangleLeft.y) * (triangleTop.x - triangleLeft.x) / (triangleTop.y - triangleLeft.y);
+        const xMax = triangleRight.x + (randomY - triangleRight.y) * (triangleTop.x - triangleRight.x) / (triangleTop.y - triangleRight.y);
+        var randomX = Math.random() * (xMax - xMin) + xMin;
+        const randomPoint = new Point(randomX, randomY);
+        randomPoint.draw();
+
+        for (let i = 0; i < 100000; i++) {
+            const randomTrianglePoint = trianglePoints[Math.floor(Math.random() * 3)];
+            const newPoint = new Point(Math.abs(randomX - randomTrianglePoint.x) / 2 + Math.min(randomX, randomTrianglePoint.x), Math.abs(randomY - randomTrianglePoint.y) / 2 + Math.min(randomY, randomTrianglePoint.y));
+            randomX = newPoint.x;
+            randomY = newPoint.y;
+            
+            setTimeout(() => {
+                ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                newPoint.draw();
+            }, 1000);
+        }
+
+    </script>
+</body>
+</html>
